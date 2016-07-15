@@ -6,14 +6,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.command.CommandBase;
+import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.server.MinecraftServer;
 
 public class SetIslandSpawnCommand extends CommandBase implements ICommand {
     private List<String> aliases;
 
     public SetIslandSpawnCommand() {
-        aliases = new ArrayList<String>();
+        aliases = new ArrayList<>();
         aliases.add("island_setspawn");
         aliases.add("islands_setspawn");
     }
@@ -29,7 +31,7 @@ public class SetIslandSpawnCommand extends CommandBase implements ICommand {
     }
 
     @Override
-    public void processCommand(ICommandSender sender, String[] input) {
-        IslandUtils.setSpawnForIsland(input[0], Integer.getInteger(input[1]), Integer.getInteger(input[2]), Integer.getInteger(input[3]));
+    public void execute(MinecraftServer server, ICommandSender sender, String[] input) throws CommandException {
+        IslandUtils.setSpawnForIsland(input[0], sender.getPosition());
     }
 }

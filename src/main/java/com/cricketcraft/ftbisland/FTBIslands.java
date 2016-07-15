@@ -24,16 +24,18 @@ import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import cpw.mods.fml.client.event.ConfigChangedEvent;
-import cpw.mods.fml.common.Mod;
-import cpw.mods.fml.common.event.FMLPostInitializationEvent;
-import cpw.mods.fml.common.event.FMLPreInitializationEvent;
-import cpw.mods.fml.common.event.FMLServerStartingEvent;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.client.event.ConfigChangedEvent;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import net.minecraftforge.common.config.Configuration;
 
-@Mod(modid = FTBIslands.MODID, name = FTBIslands.NAME, version = FTBIslands.VERSION, dependencies = "required-after:FTBU", acceptableRemoteVersions = "*")
+import net.minecraft.util.math.BlockPos;
+
+@Mod(modid = FTBIslands.MODID, name = FTBIslands.NAME, version = FTBIslands.VERSION/*, dependencies = "required-after:FTBU"*/, acceptableRemoteVersions = "*")
 public class FTBIslands {
     public static final String MODID = "FTBI";
     public static final String NAME = "FTB Islands";
@@ -45,7 +47,7 @@ public class FTBIslands {
     private static File oldIslands;
     private static File directory;
 
-    public static ArrayList<IslandCreator.IslandPos> islandLoc = new ArrayList<IslandCreator.IslandPos>();
+    public static ArrayList<IslandCreator.IslandPos> islandLoc = new ArrayList<>();
 
     @Mod.EventHandler
     public void serverLoading(FMLServerStartingEvent event) {
@@ -70,12 +72,12 @@ public class FTBIslands {
 
     private void addIslandToList(int x) {
         if (x != 0) {
-            islandLoc.add(new IslandCreator.IslandPos(x * 1000, 60, x * 1000));
-            islandLoc.add(new IslandCreator.IslandPos(-x * 1000, 60, x * 1000));
-            islandLoc.add(new IslandCreator.IslandPos(-x * 1000, 60, -x * 1000));
-            islandLoc.add(new IslandCreator.IslandPos(x * 1000, 60, -x * 1000));
+            islandLoc.add(new IslandCreator.IslandPos(new BlockPos(x * 1000, 60, x * 1000)));
+            islandLoc.add(new IslandCreator.IslandPos(new BlockPos(-x * 1000, 60, x * 1000)));
+            islandLoc.add(new IslandCreator.IslandPos(new BlockPos(-x * 1000, 60, -x * 1000)));
+            islandLoc.add(new IslandCreator.IslandPos(new BlockPos(x * 1000, 60, -x * 1000)));
         } else {
-            islandLoc.add(new IslandCreator.IslandPos(x * 1000, 60, x * 1000));
+            islandLoc.add(new IslandCreator.IslandPos(new BlockPos(x * 1000, 60, x * 1000)));
         }
     }
 
@@ -95,9 +97,7 @@ public class FTBIslands {
             logger.info("Islands.ser found, attempting conversion.");
             try {
                 convert();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (ClassNotFoundException e) {
+            } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();
             }
         }
@@ -114,7 +114,7 @@ public class FTBIslands {
         BufferedReader br = new BufferedReader(new FileReader(islands.getPath()));
         if (br.readLine() == null) {
             logger.info("Islands file empty, placing a default value.");
-            IslandCreator.islandLocations.put("default", new IslandCreator.IslandPos(0, 60, 0));
+            IslandCreator.islandLocations.put("default", new IslandCreator.IslandPos(new BlockPos(0, 60, 0)));
             try {
                 saveIslands(IslandCreator.islandLocations);
             } catch (IOException e) {
@@ -139,7 +139,7 @@ public class FTBIslands {
     private static class Config {
         private static Configuration config;
 
-        public static void init(File file) {
+        static void init(File file) {
             if (config == null) {
                 config = new Configuration(file);
                 loadConfig();
@@ -194,7 +194,7 @@ public class FTBIslands {
 
         @SubscribeEvent
         public void onChanged(ConfigChangedEvent.OnConfigChangedEvent event) {
-            if (event.modID.equalsIgnoreCase(FTBIslands.MODID)) {
+            if (event.getModID().equalsIgnoreCase(FTBIslands.MODID)) {
                 loadConfig();
             }
         }

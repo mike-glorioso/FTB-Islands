@@ -2,14 +2,21 @@ package com.cricketcraft.ftbisland.commands;
 
 import com.cricketcraft.ftbisland.IslandUtils;
 
-import java.util.ArrayList;
-import java.util.List;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 
 import net.minecraft.command.CommandBase;
+import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.command.PlayerNotFoundException;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.util.ChatComponentText;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextComponentString;
+
+import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
 
 public class JoinIslandCommand extends CommandBase implements ICommand {
     private List<String> aliases;
@@ -39,30 +46,35 @@ public class JoinIslandCommand extends CommandBase implements ICommand {
     public String getCommandUsage(ICommandSender sender) {
         return "island_join <IslandName>";
     }
-    
+
     @Override
-    public List addTabCompletionOptions(ICommandSender sender, String[] input) {
-        return input.length == 1 ? getListOfStringsMatchingLastWord(input, getPlayers())
-                : null;
+    public List<String> getTabCompletionOptions(MinecraftServer server, ICommandSender sender, String[] input, @Nullable BlockPos pos) {
+        return input.length == 1 ? getListOfStringsMatchingLastWord(input, getPlayers()) : null;
     }
 
     protected String[] getPlayers() {
-        return MinecraftServer.getServer().getAllUsernames();
+        return FMLCommonHandler.instance().getMinecraftServerInstance().getAllUsernames();
     }
 
     @Override
-    public void processCommand(ICommandSender sender, String[] input) {
-        EntityPlayerMP player = getCommandSenderAsPlayer(sender);
+    public void execute(MinecraftServer server, ICommandSender sender, String[] input) throws CommandException {
+        EntityPlayerMP player = null;
+        try {
+            player = getCommandSenderAsPlayer(sender);
+        } catch (PlayerNotFoundException e) {
+            e.printStackTrace();
+            return;
+        }
 
         if (input.length == 0) {
-            sender.addChatMessage(new ChatComponentText("Invalid arguments!"));
+            sender.addChatMessage(new TextComponentString("Invalid arguments!"));
         } else {
             IslandUtils.joinIsland(input[0], player);
         }
     }
 
     @Override
-    public boolean canCommandSenderUseCommand(ICommandSender p_71519_1_) {
+    public boolean checkPermission(MinecraftServer server, ICommandSender sender) {
         return true;
     }
 }

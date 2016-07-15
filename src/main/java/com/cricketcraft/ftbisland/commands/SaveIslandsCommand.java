@@ -7,8 +7,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.command.CommandBase;
+import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.server.MinecraftServer;
 
 public class SaveIslandsCommand extends CommandBase implements ICommand {
     private List<String> aliases;
@@ -30,7 +32,7 @@ public class SaveIslandsCommand extends CommandBase implements ICommand {
     }
 
     @Override
-    public void processCommand(ICommandSender sender, String[] input) {
+    public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
         try {
             FTBIslands.saveIslands(FTBIslands.getIslands());
         } catch (IOException e) {

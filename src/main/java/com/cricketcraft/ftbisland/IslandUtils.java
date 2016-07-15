@@ -2,7 +2,8 @@ package com.cricketcraft.ftbisland;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
 
 public class IslandUtils {
@@ -13,7 +14,7 @@ public class IslandUtils {
             return false;
         }
         IslandCreator.IslandPos pos = FTBIslands.islandLoc.get(IslandCreator.islandLocations.size() + 1);
-        IslandCreator.spawnIslandAt(world, pos.getX(), pos.getY(), pos.getZ(), playerName, (player != null ? player : null));
+        IslandCreator.spawnIslandAt(world, new BlockPos(pos.getX(), pos.getY(), pos.getZ()), playerName, (player != null ? player : null));
         return true;
     }
 
@@ -24,8 +25,8 @@ public class IslandUtils {
         IslandCreator.save();
     }
 
-    public static void setSpawnForIsland(String s, int x, int y, int z) {
-        IslandCreator.IslandPos pos = new IslandCreator.IslandPos(x, y, z);
+    public static void setSpawnForIsland(String s, BlockPos blockPos) {
+        IslandCreator.IslandPos pos = new IslandCreator.IslandPos(blockPos);
         IslandCreator.islandLocations.remove(s);
         IslandCreator.islandLocations.put(s, pos);
         IslandCreator.save();
@@ -37,14 +38,14 @@ public class IslandUtils {
         } else {
             IslandCreator.reloadIslands();
             if (IslandCreator.islandLocations.containsKey(islandName)) {
-                IslandCreator.IslandPos pos = new IslandCreator.IslandPos(0, 60, 0);
+                IslandCreator.IslandPos pos = new IslandCreator.IslandPos(new BlockPos(0, 60, 0));
                 for (String key : IslandCreator.islandLocations.keySet()) {
                     if (key.equalsIgnoreCase(islandName)) {
                         pos = IslandCreator.islandLocations.get(key);
                     }
                 }
                 if (player.dimension != 0) {
-                    player.travelToDimension(0);
+                    player.changeDimension(0);
                 }
                 int x = pos.getX();
                 int y = pos.getY();
@@ -58,7 +59,7 @@ public class IslandUtils {
                     //playerMP.setSpawnChunk(chunk, true);
                 }
             } else {
-                player.addChatComponentMessage(new ChatComponentText("Island does not exist!"));
+                player.addChatComponentMessage(new TextComponentString("Island does not exist!"));
             }
         }
     }

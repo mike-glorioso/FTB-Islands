@@ -3,15 +3,17 @@ package com.cricketcraft.ftbisland.commands;
 import com.cricketcraft.ftbisland.FTBIslands;
 import com.cricketcraft.ftbisland.IslandUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import net.minecraft.command.CommandBase;
+import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.util.ChatComponentText;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class DeleteIslandCommand extends CommandBase implements ICommand {
     private List<String> aliases;
@@ -38,13 +40,13 @@ public class DeleteIslandCommand extends CommandBase implements ICommand {
     }
 
     @Override
-    public void processCommand(ICommandSender sender, String[] input) {
+    public void execute(MinecraftServer server, ICommandSender sender, String[] input) throws CommandException {
         World world = sender.getEntityWorld();
-        EntityPlayerMP player = (EntityPlayerMP) world.getPlayerEntityByName(sender.getCommandSenderName());
+        EntityPlayerMP player = (EntityPlayerMP) world.getPlayerEntityByName(sender.getName());
         boolean exists = player != null;
         IslandUtils.deleteIsland(input[0]);
         if (exists) {
-            player.addChatComponentMessage(new ChatComponentText(String.format("Successfully deleted island %s", input[0])));
+            player.addChatComponentMessage(new TextComponentString(String.format("Successfully deleted island %s", input[0])));
         } else {
             FTBIslands.logger.info(String.format("Successfully deleted island %s", input[0]));
         }
